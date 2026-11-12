@@ -1,5 +1,5 @@
 # Iran-SMS-bomber
-🇮🇷 Iranian SMS Bomber
+💣 Iranian SMS Bomber
 
 ابزار ارسال و بررسی درخواست‌های OTP سرویس‌های ایرانی با Python
 
@@ -40,3 +40,74 @@
 Language: Python
 Platform: Cross-Platform
 Category: API Research & HTTP Automation
+
+💣 Iranian SMS Bomber
+
+📖 آموزش استفاده از پروژه
+
+این ابزار با زبان Python توسعه داده شده و برای اجرا در محیط Pydroid 3 و کامپیوتر طراحی شده است.
+
+⚙️ نصب و راه‌اندازی
+
+1. نصب Python
+
+ابتدا Python 3 را نصب کنید.
+
+2. نصب کتابخانه موردنیاز
+
+pip install requests
+
+3. دریافت پروژه
+
+git clone YOUR_REPOSITORY_URL
+
+4. ورود به پوشه پروژه
+
+cd Iranian-SMS-Bomber
+
+5. اجرای برنامه
+
+python main.py
+
+🧩 معرفی بخش‌های برنامه
+
+بخش| توضیحات
+"normalize()"| استانداردسازی شماره تلفن
+"make_phones()"| ساخت فرمت‌های مختلف شماره
+"fill()"| جایگزینی اطلاعات در درخواست‌ها
+"send_one()"| ارسال و بررسی یک درخواست HTTP
+"main()"| مدیریت اجرای برنامه
+"ENDPOINTS"| فهرست سرویس‌های تعریف‌شده
+"ThreadPoolExecutor"| مدیریت درخواست‌های هم‌زمان
+
+📊 وضعیت پاسخ سرورها
+
+- "200": پاسخ موفق HTTP
+- "201": ایجاد موفق منبع
+- "202": درخواست پذیرفته شده
+- "400": درخواست نامعتبر
+- "429": محدودیت تعداد درخواست‌ها
+- "500": خطای داخلی سرور
+
+🛠️ تکنولوژی‌های استفاده‌شده
+
+- Python 3
+- Requests
+- Threading
+- Concurrent Futures
+- HTTP / REST API
+- JSON
+
+⚠️ نکات فنی
+
+- پاسخ موفق HTTP لزوماً به معنی ارسال موفق پیامک نیست.
+- API سرویس‌ها ممکن است تغییر کنند.
+- محدودیت درخواست (Rate Limit) ممکن است باعث رد شدن درخواست شود.
+- این پروژه برای مطالعه ساختار API و بررسی سیستم‌های احراز هویت OTP ارائه شده است.
+- برای آزمایش، از API محلی یا محیط تست با شماره‌های متعلق به خودتان استفاده کنید.
+
+---
+
+Developer: Iranian SMS API Research
+Language: Python
+Version: 1.0.0
