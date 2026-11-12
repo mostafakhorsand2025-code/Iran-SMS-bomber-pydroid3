@@ -1,95 +1,66 @@
-# Iran-SMS-bomber
-💣 Iranian SMS Bomber
+🦁☀️ Iran-SMS-Bomber
+این متن با هوش مصنوعی درست شده
+<div align="center">IRAN-SMS-BOMBER
 
-ابزار ارسال و بررسی درخواست‌های OTP سرویس‌های ایرانی با Python
+ابزار تحقیق و بررسی APIهای پیامکی ایران
 
-این پروژه یک ابزار مبتنی بر Python است که برای بررسی و تحلیل سیستم‌های احراز هویت پیامکی (SMS OTP) سرویس‌های مختلف ایرانی طراحی شده است.
+Iranian SMS OTP API Research Tool
 
-✨ ویژگی‌ها
+""Python" (https://img.shields.io/badge/Python-3.x-blue?logo=python)" (https://www.python.org/)
+""Platform" (https://img.shields.io/badge/Platform-Cross--Platform-green)" (#)
+""Status" (https://img.shields.io/badge/Status-Experimental-orange)" (#)
 
-- پشتیبانی از چندین سرویس و API ایرانی
-- پیاده‌سازی درخواست‌های HTTP با کتابخانه "Requests"
-- پشتیبانی از متدهای GET و POST
-- مدیریت درخواست‌ها با "ThreadPoolExecutor"
-- پردازش هم‌زمان درخواست‌ها با Multi-Threading
-- تشخیص کد وضعیت HTTP و ثبت نتیجه درخواست‌ها
-- نرمال‌سازی شماره تلفن ایران
-- پشتیبانی از ورودی شماره با فرمت‌های مختلف
-- نمایش گزارش درخواست‌های موفق و ناموفق
-- قابلیت اجرا در محیط Pydroid 3
+جاوید شاه 👑 | LONG LIVE THE KING
 
-🛠️ تکنولوژی‌ها
+جاوید ایران ☀️🦁 | LONG LIVE IRAN
 
-- Python 3
-- Requests
-- Threading
-- Concurrent Futures
+</div>---
 
-📱 محیط اجرا
+📖 درباره پروژه | About
 
-- Android (Pydroid 3)
-- Windows
-- Linux
+فارسی:
 
-📌 هدف پروژه
+Iran-SMS-Bomber پروژه‌ای مبتنی بر Python برای بررسی و تحلیل ساختار APIهای احراز هویت پیامکی (OTP)، مدیریت درخواست‌های HTTP و بررسی پاسخ سرویس‌های ایرانی است.
 
-بررسی نحوه عملکرد APIهای احراز هویت، تحلیل پاسخ سرورها و آشنایی با ساختار سیستم‌های ارسال کد یک‌بارمصرف (OTP).
+English:
 
----
+Iran-SMS-Bomber is a Python-based project for studying SMS OTP authentication APIs, managing HTTP requests, and analyzing responses from Iranian services.
 
-Language: Python
-Platform: Cross-Platform
-Category: API Research & HTTP Automation
+✨ ویژگی‌ها | Features
 
-💣 Iranian SMS Bomber
+- پشتیبانی از درخواست‌های GET و POST
 
-📖 آموزش استفاده از پروژه
+- مدیریت درخواست‌های HTTP
 
-این ابزار با زبان Python توسعه داده شده و برای اجرا در محیط Pydroid 3 و کامپیوتر طراحی شده است.
+- پردازش هم‌زمان با Multi-Threading
 
-⚙️ نصب و راه‌اندازی
+- بررسی HTTP Status Codes
 
-1. نصب Python
+- استانداردسازی شماره تلفن ایران
 
-ابتدا Python 3 را نصب کنید.
+- پشتیبانی از JSON
 
-2. نصب کتابخانه موردنیاز
+- ثبت نتایج درخواست‌ها
 
-pip install requests
+- سازگاری با Pydroid 3
 
-3. دریافت پروژه
+- GET and POST request support
 
-git clone YOUR_REPOSITORY_URL
+- HTTP request management
 
-4. ورود به پوشه پروژه
+- Multi-threaded processing
 
-cd Iranian-SMS-Bomber
+- HTTP status code detection
 
-5. اجرای برنامه
+- Iranian phone number normalization
 
-python main.py
+- JSON support
 
-🧩 معرفی بخش‌های برنامه
+- Request result reporting
 
-بخش| توضیحات
-"normalize()"| استانداردسازی شماره تلفن
-"make_phones()"| ساخت فرمت‌های مختلف شماره
-"fill()"| جایگزینی اطلاعات در درخواست‌ها
-"send_one()"| ارسال و بررسی یک درخواست HTTP
-"main()"| مدیریت اجرای برنامه
-"ENDPOINTS"| فهرست سرویس‌های تعریف‌شده
-"ThreadPoolExecutor"| مدیریت درخواست‌های هم‌زمان
+- Pydroid 3 compatibility
 
-📊 وضعیت پاسخ سرورها
-
-- "200": پاسخ موفق HTTP
-- "201": ایجاد موفق منبع
-- "202": درخواست پذیرفته شده
-- "400": درخواست نامعتبر
-- "429": محدودیت تعداد درخواست‌ها
-- "500": خطای داخلی سرور
-
-🛠️ تکنولوژی‌های استفاده‌شده
+🛠️ تکنولوژی‌ها | Technologies
 
 - Python 3
 - Requests
@@ -98,16 +69,80 @@ python main.py
 - HTTP / REST API
 - JSON
 
-⚠️ نکات فنی
+💻 سیستم‌عامل‌ها | Platforms
 
-- پاسخ موفق HTTP لزوماً به معنی ارسال موفق پیامک نیست.
-- API سرویس‌ها ممکن است تغییر کنند.
-- محدودیت درخواست (Rate Limit) ممکن است باعث رد شدن درخواست شود.
-- این پروژه برای مطالعه ساختار API و بررسی سیستم‌های احراز هویت OTP ارائه شده است.
-- برای آزمایش، از API محلی یا محیط تست با شماره‌های متعلق به خودتان استفاده کنید.
+- Android
+- Windows
+- Linux
+
+🚀 نصب و راه‌اندازی | Installation
+
+دریافت پروژه | Clone Repository
+
+git clone YOUR_REPOSITORY_URL
+
+ورود به پوشه | Enter Directory
+
+cd Iran-SMS-Bomber
+
+نصب کتابخانه‌ها | Install Dependencies
+
+pip install requests
+
+اجرای برنامه | Run
+
+python main.py
+
+📂 ساختار پروژه | Project Structure
+
+Iran-SMS-Bomber/
+├── main.py
+├── README.md
+└── requirements.txt
+
+📊 کدهای HTTP | HTTP Status Codes
+
+Code| Description
+200| OK
+201| Created
+202| Accepted
+400| Bad Request
+429| Too Many Requests
+500| Internal Server Error
+
+⚠️ نکات فنی | Technical Notes
+
+فارسی:
+
+- پاسخ موفق HTTP لزوماً به معنی تحویل پیامک نیست.
+- APIها ممکن است در طول زمان تغییر کنند.
+- آزمایش‌ها باید در محیط کنترل‌شده و با شماره‌های متعلق به خودتان انجام شوند.
+
+English:
+
+- Successful HTTP responses do not guarantee SMS delivery.
+- API endpoints may change over time.
+- Testing should use controlled environments and your own test numbers.
+
+👨‍💻 توسعه‌دهنده | Developer
+
+Independent Iranian Developer
+
+- Country: Iran
+- Historical Symbol: Lion and Sun
+- Identity: Proud Iranian
+- Supporter of Iran's historical Lion and Sun flag.
 
 ---
 
-Developer: Iranian SMS API Research
-Language: Python
-Version: 1.0.0
+<div align="center">🦁 ☀️ 👑
+
+جاوید شاه
+
+LONG LIVE THE KING
+
+پاینده ایران | LONG LIVE IRAN
+
+Made with ❤️
+
+</div>
